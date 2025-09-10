@@ -1,358 +1,151 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Найди хобби</title>
+    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <!-- Страница загрузки -->
+        <div class="page active" id="loadingPage">
+            <div class="content">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+                <p>Загрузка приложения...</p>
+                <p class="loading-subtext">Подключаемся к ВКонтакте</p>
+            </div>
+        </div>
 
-body {
-    background: var(--background_content, #f5f5f5);
-    color: var(--text_primary, #000000);
-    min-height: 100vh;
-    padding: 0;
-    margin: 0;
-}
+        <!-- Страница онбординга 1 -->
+        <div class="page" id="onboarding1">
+            <div class="header">
+                <div class="header-title">Найди хобби</div>
+            </div>
+            <div class="content">
+                <div class="illustration">🎯</div>
+                <h1 id="welcomeTitle">Найди свое идеальное хобби!</h1>
+                <p>Пройди короткий тест из 5 вопросов, и мы подберем хобби, которое идеально подходит именно тебе!</p>
+                <button class="vk-button primary" onclick="showPage('onboarding2')">
+                    Далее <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Страница онбординга 2 -->
+        <div class="page" id="onboarding2">
+            <div class="header">
+                <div class="back-button" onclick="showPage('onboarding1')">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+                <div class="header-title">Как это работает?</div>
+            </div>
+            <div class="content">
+                <div class="illustration">❤️</div>
+                <p>Отвечай на вопросы честно, не задумываясь слишком долго. Выбирай то, что ближе именно тебе.</p>
+                <button class="vk-button primary" onclick="showPage('start')">
+                    Понятно <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Стартовая страница -->
+        <div class="page" id="start">
+            <div class="header">
+                <div class="back-button" onclick="showPage('onboarding2')">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+                <div class="header-title">Начнем тест</div>
+            </div>
+            <div class="content">
+                <div class="illustration">🌟</div>
+                <p>Тест займет не более 3 минут. Твои ответы помогут нам понять, какое занятие принесет тебе наибольшее удовольствие!</p>
+                <button class="vk-button primary" onclick="startTest()">
+                    Начать тест <i class="fas fa-play"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Страницы с вопросами -->
+        <div class="page" id="questionPage">
+            <div class="header">
+                <div class="back-button" onclick="prevQuestionOrBack()">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+                <div class="header-title">Вопрос <span id="currentQuestionNumber">1</span>/5</div>
+            </div>
+            <div class="content">
+                <h2 id="questionTitle">Вопрос</h2>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="options" id="optionsContainer">
+                    <!-- Варианты ответов будут добавляться динамически -->
+                </div>
+                <button class="vk-button primary" id="nextBtn" onclick="nextQuestion()" disabled>
+                    Далее <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Страница результата -->
+        <div class="page" id="resultPage">
+            <div class="header">
+                <div class="header-title">Ваш результат</div>
+            </div>
+            <div class="content">
+                <h1>Ваше идеальное хобби</h1>
+                <div class="result-card">
+                    <div class="result-icon" id="resultIcon">🎨</div>
+                    <div class="result-title" id="resultTitle">Название хобби</div>
+                    <div class="result-description" id="resultDescription">Описание будет здесь</div>
+                    <button class="vk-button secondary" onclick="showDetails()">
+                        <i class="fas fa-info-circle"></i> Что нужно для начала?
+                    </button>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="vk-button primary" onclick="shareResult()">
+                        <i class="fas fa-share"></i> Поделиться
+                    </button>
+                    <button class="vk-button outline" onclick="restartTest()">
+                        <i class="fas fa-redo"></i> Пройти еще раз
+                    </button>
+                </div>
+            </div>
+        </div>
 
-#app {
-    max-width: 100%;
-    min-height: 100vh;
-}
+        <!-- Страница ошибки -->
+        <div class="page" id="errorPage">
+            <div class="content">
+                <div class="illustration">😕</div>
+                <h1>Что-то пошло не так</h1>
+                <p>Попробуйте перезагрузить приложение или вернуться позже</p>
+                <button class="vk-button primary" onclick="location.reload()">
+                    <i class="fas fa-refresh"></i> Перезагрузить
+                </button>
+            </div>
+        </div>
+    </div>
 
-.page {
-    display: none;
-    flex-direction: column;
-    min-height: 100vh;
-    background: var(--background_content, #ffffff);
-}
+    <!-- Панель с деталями хобби -->
+    <div class="overlay" id="overlay" onclick="hideDetails()"></div>
+    <div class="details-panel" id="detailsPanel">
+        <div class="panel-header">
+            <div class="drag-handle"></div>
+            <h2 id="detailsTitle">Детали хобби</h2>
+        </div>
+        <div class="close-btn" onclick="hideDetails()"><i class="fas fa-times"></i></div>
+        <div class="details-content" id="detailsContent">
+            <!-- Контент будет добавляться динамически -->
+        </div>
+    </div>
 
-.page.active {
-    display: flex;
-}
-
-/* Header Styles */
-.header {
-    background: var(--header_background, #ffffff);
-    padding: 12px 16px;
-    border-bottom: 1px solid var(--separator_common, #e1e3e6);
-    display: flex;
-    align-items: center;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
-
-.back-button {
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--icon_secondary, #99a2ad);
-    font-size: 18px;
-    margin-right: 8px;
-}
-
-.header-title {
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--text_primary, #000000);
-}
-
-/* Content Styles */
-.content {
-    flex: 1;
-    padding: 20px 16px;
-    display: flex;
-    flex-direction: column;
-}
-
-/* VK Button Styles */
-.vk-button {
-    padding: 12px 20px;
-    border-radius: 8px;
-    border: none;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    transition: all 0.2s ease;
-    margin-top: 16px;
-    width: 100%;
-}
-
-.vk-button.primary {
-    background: var(--button_primary_background, #2688eb);
-    color: var(--button_primary_foreground, #ffffff);
-}
-
-.vk-button.primary:active {
-    background: var(--button_primary_background, #1c6bc0);
-}
-
-.vk-button.secondary {
-    background: var(--button_secondary_background, #f2f3f5);
-    color: var(--button_secondary_foreground, #000000);
-}
-
-.vk-button.outline {
-    background: transparent;
-    border: 1px solid var(--button_outline_border, #d7d8d9);
-    color: var(--button_outline_foreground, #000000);
-}
-
-.vk-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* Illustration */
-.illustration {
-    width: 120px;
-    height: 120px;
-    background: var(--background_highlighted, #f0f2f5);
-    border-radius: 20px;
-    margin: 20px auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 60px;
-}
-
-/* Typography */
-h1 {
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--text_primary, #000000);
-    margin-bottom: 12px;
-    text-align: center;
-}
-
-h2 {
-    font-size: 18px;
-    font-weight: 500;
-    color: var(--text_primary, #000000);
-    margin-bottom: 16px;
-    text-align: center;
-}
-
-p {
-    font-size: 15px;
-    line-height: 1.4;
-    color: var(--text_secondary, #6d7885);
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-/* Progress Bar */
-.progress-container {
-    width: 100%;
-    height: 4px;
-    background: var(--field_border, #e1e3e6);
-    border-radius: 2px;
-    margin: 20px 0;
-}
-
-.progress-bar {
-    height: 100%;
-    background: var(--accent, #2688eb);
-    border-radius: 2px;
-    width: 0%;
-    transition: width 0.3s ease;
-}
-
-/* Options */
-.options {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin: 16px 0;
-}
-
-.option {
-    padding: 16px;
-    background: var(--background_content, #ffffff);
-    border: 1px solid var(--field_border, #e1e3e6);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 15px;
-}
-
-.option:hover {
-    border-color: var(--accent, #2688eb);
-    background: var(--background_highlighted, #f0f2f5);
-}
-
-.option.selected {
-    border-color: var(--accent, #2688eb);
-    background: var(--background_highlighted, #f0f2f5);
-}
-
-/* Result Card */
-.result-card {
-    background: var(--background_highlighted, #f0f2f5);
-    border-radius: 12px;
-    padding: 20px;
-    margin: 16px 0;
-    text-align: center;
-}
-
-.result-icon {
-    font-size: 48px;
-    margin-bottom: 12px;
-}
-
-.result-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text_primary, #000000);
-    margin-bottom: 8px;
-}
-
-.result-description {
-    font-size: 14px;
-    color: var(--text_secondary, #6d7885);
-    line-height: 1.4;
-    margin-bottom: 16px;
-}
-
-/* Action Buttons */
-.action-buttons {
-    display: flex;
-    gap: 12px;
-    margin-top: 20px;
-}
-
-.action-buttons .vk-button {
-    margin-top: 0;
-    flex: 1;
-}
-
-/* Details Panel */
-.details-panel {
-    position: fixed;
-    bottom: -100%;
-    left: 0;
-    width: 100%;
-    height: 80vh;
-    background: var(--background_content, #ffffff);
-    border-top-left-radius: 16px;
-    border-top-right-radius: 16px;
-    padding: 20px;
-    overflow-y: auto;
-    transition: bottom 0.3s ease;
-    z-index: 1000;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
-}
-
-.details-panel.active {
-    bottom: 0;
-}
-
-.panel-header {
-    text-align: center;
-    padding: 16px 0;
-    position: relative;
-    margin-bottom: 20px;
-}
-
-.drag-handle {
-    position: absolute;
-    top: 8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 40px;
-    height: 4px;
-    background: var(--separator_common, #e1e3e6);
-    border-radius: 2px;
-}
-
-.details-content {
-    margin-top: 10px;
-}
-
-.details-item {
-    margin-bottom: 24px;
-}
-
-.details-item h3 {
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 12px;
-    color: var(--text_primary, #000000);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.requirements-list {
-    padding-left: 20px;
-}
-
-.requirements-list li {
-    margin-bottom: 8px;
-    font-size: 14px;
-    color: var(--text_secondary, #6d7885);
-}
-
-.community-link {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px;
-    background: var(--background_highlighted, #f0f2f5);
-    border-radius: 8px;
-    text-decoration: none;
-    color: var(--text_primary, #000000);
-    margin-bottom: 8px;
-    font-size: 14px;
-}
-
-.close-btn {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--icon_secondary, #99a2ad);
-    font-size: 20px;
-    z-index: 1001;
-}
-
-.overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    display: none;
-    z-index: 999;
-}
-
-.overlay.active {
-    display: block;
-}
-
-/* Adaptive */
-@media (max-width: 360px) {
-    .content {
-        padding: 16px 12px;
-    }
-    
-    .illustration {
-        width: 100px;
-        height: 100px;
-        font-size: 50px;
-    }
-    
-    .action-buttons {
-        flex-direction: column;
-    }
-}
+    <script src="data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

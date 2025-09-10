@@ -1,0 +1,24 @@
+{
+  "manifest_version": 2,
+  "version": "1.0.0",
+  "name": "Найди хобби",
+  "description": "Тест для поиска идеального хобби",
+  "author": "Your Name",
+  "author_url": "https://vk.com/your_page",
+  "app_icon_url": "https://your-domain.com/icon.png",
+  "app_icon_url_small": "https://your-domain.com/icon_small.png",
+  "background_color": "#2688eb",
+  "theme_color": "#2688eb",
+  "url": "https://your-domain.com/index.html",
+  "scope": "/",
+  "platform_version": "2.0",
+  "permissions": [
+    "share",
+    "open_url"
+  ],
+  "orientation": "portrait",
+  "features": [
+    "payment",
+    "share"
+  ]
+}

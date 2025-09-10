@@ -10,14 +10,25 @@
 </head>
 <body>
     <div id="app">
+        <!-- Страница загрузки -->
+        <div class="page active" id="loadingPage">
+            <div class="content">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i>
+                </div>
+                <p>Загрузка приложения...</p>
+                <p class="loading-subtext">Подключаемся к ВКонтакте</p>
+            </div>
+        </div>
+
         <!-- Страница онбординга 1 -->
-        <div class="page active" id="onboarding1">
+        <div class="page" id="onboarding1">
             <div class="header">
                 <div class="header-title">Найди хобби</div>
             </div>
             <div class="content">
                 <div class="illustration">🎯</div>
-                <h1>Найди свое идеальное хобби!</h1>
+                <h1 id="welcomeTitle">Найди свое идеальное хобби!</h1>
                 <p>Пройди короткий тест из 5 вопросов, и мы подберем хобби, которое идеально подходит именно тебе!</p>
                 <button class="vk-button primary" onclick="showPage('onboarding2')">
                     Далее <i class="fas fa-arrow-right"></i>
@@ -105,6 +116,18 @@
                         <i class="fas fa-redo"></i> Пройти еще раз
                     </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Страница ошибки -->
+        <div class="page" id="errorPage">
+            <div class="content">
+                <div class="illustration">😕</div>
+                <h1>Что-то пошло не так</h1>
+                <p>Попробуйте перезагрузить приложение или вернуться позже</p>
+                <button class="vk-button primary" onclick="location.reload()">
+                    <i class="fas fa-refresh"></i> Перезагрузить
+                </button>
             </div>
         </div>
     </div>
